@@ -273,7 +273,7 @@ If `true`, the slider move relative to where the mouse started at. Default is `f
 ### speed (optional)
 
 ```ts
-speed: float;
+speed: number;
 ```
 
 If relativeDrag == `true`, the slider will move relative to the mouse with a speed multiplier. Default is `1.0`.
