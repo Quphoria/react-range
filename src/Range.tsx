@@ -32,7 +32,8 @@ class Range extends React.Component<IProps> {
     min: 0,
     max: 100,
     relativeDrag: false,
-    speed: 1.0
+    speed: 1.0,
+    shiftSpeed: 0.1,
   };
   trackRef = React.createRef<HTMLElement>();
   thumbRefs: React.RefObject<HTMLElement>[] = [];
@@ -263,7 +264,7 @@ class Range extends React.Component<IProps> {
         },
         () => {
           if (!this.props.relativeDrag) {
-            this.onMove(e.clientX, e.clientY)
+            this.onMove(e.clientX, e.clientY, e.shiftKey)
           }
         }
       );
@@ -283,7 +284,7 @@ class Range extends React.Component<IProps> {
         },
         () => {
           if (!this.props.relativeDrag) {
-            this.onMove(e.clientX, e.clientY)
+            this.onMove(e.clientX, e.clientY, e.shiftKey)
           }
         }
       );
@@ -315,7 +316,7 @@ class Range extends React.Component<IProps> {
         },
         () => {
           if (!this.props.relativeDrag) {
-            this.onMove(e.touches[0].clientX, e.touches[0].clientY)
+            this.onMove(e.touches[0].clientX, e.touches[0].clientY, e.shiftKey)
           }
         }
       );
@@ -335,7 +336,7 @@ class Range extends React.Component<IProps> {
         },
         () => {
           if (!this.props.relativeDrag) {
-            this.onMove(e.touches[0].clientX, e.touches[0].clientY)
+            this.onMove(e.touches[0].clientX, e.touches[0].clientY, e.shiftKey)
           }
         }
       );
@@ -366,7 +367,7 @@ class Range extends React.Component<IProps> {
 
   onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
-    this.onMove(e.clientX, e.clientY);
+    this.onMove(e.clientX, e.clientY, e.shiftKey);
     this.setState({
       lastMouse: [e.clientX, e.clientY]
     });
@@ -374,7 +375,7 @@ class Range extends React.Component<IProps> {
 
   onTouchMove = (e: TouchEvent) => {
     e.preventDefault();
-    this.onMove(e.touches[0].clientX, e.touches[0].clientY);
+    this.onMove(e.touches[0].clientX, e.touches[0].clientY, e.shiftKey);
     this.setState({
       lastMouse: [e.touches[0].clientX, e.touches[0].clientY]
     });
@@ -451,9 +452,9 @@ class Range extends React.Component<IProps> {
     );
   };
 
-  onMove = (clientX: number, clientY: number) => {
+  onMove = (clientX: number, clientY: number, shiftPressed: boolean) => {
     const { draggedThumbIndex, draggedTrackPos } = this.state;
-    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed } = this.props;
+    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed } = this.props;
     if (
       draggedThumbIndex === -1 &&
       draggedTrackPos[0] === -1 &&
@@ -489,7 +490,7 @@ class Range extends React.Component<IProps> {
       }
       if (relativeDrag) {
         // Apply speed adjustment
-        deltaValue *= -speed; // Invert direction as well
+        deltaValue *= -(shiftPressed ? shiftSpeed : speed); // Invert direction as well
       } 
       // invert for RTL
       if (rtl) {
