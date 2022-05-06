@@ -262,6 +262,22 @@ rtl: boolean;
 
 If `true`, the slider will be optimized for RTL layouts. Default is `false`.
 
+### relativeDrag (optional)
+
+```ts
+relativeDrag: boolean;
+```
+
+If `true`, the slider move relative to where the mouse started at. Default is `false`.
+
+### speed (optional)
+
+```ts
+speed: float;
+```
+
+If relativeDrag == `true`, the slider will move relative to the mouse with a speed multiplier. Default is `1.0`.
+
 ## getTrackBackground
 
 There is an additional helper function being exported from `react-range`. Your track is most likely a `div` with some background. What if you want to achieve a nice "progress bar" effect where the part before the thumb has different color than the part after? What if you want to have the same thing even with multiple thumbs (aka differently colored segments)? **You don't need to glue together multiple divs in order to do that!** You can use a single `div` and set `background: linear-gradient(...)`. `getTrackBackground` function builds this verbose `linear-gradient(...)` for you!

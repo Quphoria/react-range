@@ -30,7 +30,9 @@ class Range extends React.Component<IProps> {
     allowOverlap: false,
     draggableTrack: false,
     min: 0,
-    max: 100
+    max: 100,
+    relativeDrag: false,
+    speed: 1.0
   };
   trackRef = React.createRef<HTMLElement>();
   thumbRefs: React.RefObject<HTMLElement>[] = [];
@@ -45,6 +47,7 @@ class Range extends React.Component<IProps> {
     draggedThumbIndex: -1,
     thumbZIndexes: new Array(this.props.values.length).fill(0).map((t, i) => i),
     isChanged: false,
+    lastMouse: [-1, -1],
     markOffsets: []
   };
 
@@ -243,6 +246,9 @@ class Range extends React.Component<IProps> {
     e.persist();
     e.preventDefault();
     this.addMouseEvents(e.nativeEvent);
+    this.setState({
+      lastMouse: [e.clientX, e.clientY]
+    });
     if (this.props.values.length > 1 && this.props.draggableTrack) {
       if (
         this.thumbRefs.some((thumbRef) =>
@@ -255,7 +261,11 @@ class Range extends React.Component<IProps> {
         {
           draggedTrackPos: [e.clientX, e.clientY]
         },
-        () => this.onMove(e.clientX, e.clientY)
+        () => {
+          if (!this.props.relativeDrag) {
+            this.onMove(e.clientX, e.clientY)
+          }
+        }
       );
     } else {
       // get the index of the thumb that is closest to the place where the track is clicked
@@ -271,7 +281,11 @@ class Range extends React.Component<IProps> {
         {
           draggedThumbIndex
         },
-        () => this.onMove(e.clientX, e.clientY)
+        () => {
+          if (!this.props.relativeDrag) {
+            this.onMove(e.clientX, e.clientY)
+          }
+        }
       );
     }
   };
@@ -284,6 +298,9 @@ class Range extends React.Component<IProps> {
   onTouchStartTrack = (e: React.TouchEvent) => {
     e.persist();
     this.addTouchEvents(e.nativeEvent);
+    this.setState({
+      lastMouse: [e.touches[0].clientX, e.touches[0].clientY]
+    });
     if (this.props.values.length > 1 && this.props.draggableTrack) {
       if (
         this.thumbRefs.some((thumbRef) =>
@@ -296,7 +313,11 @@ class Range extends React.Component<IProps> {
         {
           draggedTrackPos: [e.touches[0].clientX, e.touches[0].clientY]
         },
-        () => this.onMove(e.touches[0].clientX, e.touches[0].clientY)
+        () => {
+          if (!this.props.relativeDrag) {
+            this.onMove(e.touches[0].clientX, e.touches[0].clientY)
+          }
+        }
       );
     } else {
       // get the index of the thumb that is closest to the place where the track is clicked
@@ -312,7 +333,11 @@ class Range extends React.Component<IProps> {
         {
           draggedThumbIndex
         },
-        () => this.onMove(e.touches[0].clientX, e.touches[0].clientY)
+        () => {
+          if (!this.props.relativeDrag) {
+            this.onMove(e.touches[0].clientX, e.touches[0].clientY)
+          }
+        }
       );
     }
   };
@@ -342,11 +367,17 @@ class Range extends React.Component<IProps> {
   onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
     this.onMove(e.clientX, e.clientY);
+    this.setState({
+      lastMouse: [e.clientX, e.clientY]
+    });
   };
 
   onTouchMove = (e: TouchEvent) => {
     e.preventDefault();
     this.onMove(e.touches[0].clientX, e.touches[0].clientY);
+    this.setState({
+      lastMouse: [e.touches[0].clientX, e.touches[0].clientY]
+    });
   };
 
   onKeyDown = (e: React.KeyboardEvent) => {
@@ -422,7 +453,7 @@ class Range extends React.Component<IProps> {
 
   onMove = (clientX: number, clientY: number) => {
     const { draggedThumbIndex, draggedTrackPos } = this.state;
-    const { direction, min, max, onChange, values, step, rtl } = this.props;
+    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed } = this.props;
     if (
       draggedThumbIndex === -1 &&
       draggedTrackPos[0] === -1 &&
@@ -436,10 +467,12 @@ class Range extends React.Component<IProps> {
     const trackLength = isVertical(direction)
       ? trackRect.height
       : trackRect.width;
-    if (draggedTrackPos[0] !== -1 && draggedTrackPos[1] !== -1) {
+    const startPosX = relativeDrag ? this.state.lastMouse[0] : draggedTrackPos[0];
+    const startPosY = relativeDrag ? this.state.lastMouse[1] : draggedTrackPos[1];
+    if (startPosX !== -1 && startPosY !== -1) {
       // calculate how much it moved since the last update
-      let dX = clientX - draggedTrackPos[0];
-      let dY = clientY - draggedTrackPos[1];
+      let dX = clientX - startPosX;
+      let dY = clientY - startPosY;
       // calculate the delta of the value
       let deltaValue = 0;
       switch (direction) {
@@ -454,6 +487,10 @@ class Range extends React.Component<IProps> {
         default:
           assertUnreachable(direction);
       }
+      if (relativeDrag) {
+        // Apply speed adjustment
+        deltaValue *= speed;
+      } 
       // invert for RTL
       if (rtl) {
         deltaValue *= -1;
@@ -544,7 +581,7 @@ class Range extends React.Component<IProps> {
       this.state.draggedTrackPos[1] === -1
     )
       return null;
-    this.setState({ draggedThumbIndex: -1, draggedTrackPos: [-1, -1] }, () => {
+    this.setState({ draggedThumbIndex: -1, draggedTrackPos: [-1, -1], lastMouse: [-1, -1] }, () => {
       this.fireOnFinalChange();
     });
   };
