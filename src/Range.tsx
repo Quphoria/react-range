@@ -489,7 +489,7 @@ class Range extends React.Component<IProps> {
       }
       if (relativeDrag) {
         // Apply speed adjustment
-        deltaValue *= speed;
+        deltaValue *= -speed; // Invert direction as well
       } 
       // invert for RTL
       if (rtl) {
