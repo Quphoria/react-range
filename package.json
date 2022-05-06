@@ -14,6 +14,7 @@
   "author": "Vojtech Miksu <vojtech@miksu.cz>",
   "license": "MIT",
   "scripts": {
+    "prepare": "rm -rf lib && tsc --outDir lib && cp flowtypes/* lib && rm -rf lib/examples && mv lib/src/* lib && rm -rf lib/src && rm lib/*.test.* && rm lib/*.stories.*",
     "build": "rm -rf lib && tsc --outDir lib && cp flowtypes/* lib && rm -rf lib/examples && mv lib/src/* lib && rm -rf lib/src && rm lib/*.test.* && rm lib/*.stories.*",
     "jest:e2e": "jest --runInBand e2e",
     "jest:e2e:update": "jest --runInBand -u e2e",
