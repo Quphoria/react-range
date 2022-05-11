@@ -470,6 +470,10 @@ class Range extends React.Component<IProps> {
 
   onKeyUp = (e: React.KeyboardEvent) => {
     const { isChanged } = this.state;
+    // Only set state when a key we care about changes
+    if (!(INCREASE_KEYS.includes(e.key) ||
+      DECREASE_KEYS.includes(e.key) ||
+      e.key === 'Tab')) return;
     this.setState(
       {
         draggedThumbIndex: -1
