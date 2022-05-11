@@ -22,6 +22,7 @@ export interface IProps {
   lockPointer: boolean;
   speed: number;
   shiftSpeed: number;
+  lockedSpeedAdjustment: number;
   onChange: (values: number[]) => void;
   onFinalChange?: (values: number[]) => void;
   renderMark?: (params: IRenderMarkParams) => React.ReactNode;

@@ -34,7 +34,8 @@ class Range extends React.Component<IProps> {
     relativeDrag: false,
     lockPointer: false,
     speed: 1.0,
-    shiftSpeed: 0.1
+    shiftSpeed: 0.1,
+    lockedSpeedAdjustment: 1.0
   };
   trackRef = React.createRef<HTMLElement>();
   thumbRefs: React.RefObject<HTMLElement>[] = [];
@@ -483,7 +484,7 @@ class Range extends React.Component<IProps> {
 
   onMove = (clientX: number, clientY: number, shiftPressed: boolean, pointerLocked: boolean = false) => {
     const { draggedThumbIndex, draggedTrackPos } = this.state;
-    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed } = this.props;
+    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed, lockedSpeedAdjustment } = this.props;
     if (
       draggedThumbIndex === -1 &&
       draggedTrackPos[0] === -1 &&
@@ -525,6 +526,9 @@ class Range extends React.Component<IProps> {
       if (relativeDrag) {
         // Apply speed adjustment
         deltaValue *= -(shiftPressed ? shiftSpeed : speed); // Invert direction as well
+        if (pointerLocked) {
+          deltaValue *= lockedSpeedAdjustment;
+        }
       } 
       // invert for RTL
       if (rtl) {

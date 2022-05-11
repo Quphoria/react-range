@@ -294,6 +294,14 @@ shiftSpeed: number;
 
 Same as speed, but is used when the shift key is held (can be used to slow down or speed up the movement). Default is `0.1`.
 
+### lockedSpeedAdjustment (optional)
+
+```ts
+lockedSpeedAdjustment: number;
+```
+
+When the pointer is locked, the speed is multiplied by this amount. Default is `1.0`.
+
 ## getTrackBackground
 
 There is an additional helper function being exported from `react-range`. Your track is most likely a `div` with some background. What if you want to achieve a nice "progress bar" effect where the part before the thumb has different color than the part after? What if you want to have the same thing even with multiple thumbs (aka differently colored segments)? **You don't need to glue together multiple divs in order to do that!** You can use a single `div` and set `background: linear-gradient(...)`. `getTrackBackground` function builds this verbose `linear-gradient(...)` for you!
