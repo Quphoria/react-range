@@ -483,7 +483,7 @@ class Range extends React.Component<IProps> {
 
   onMove = (clientX: number, clientY: number, shiftPressed: boolean, pointerLocked: boolean = false) => {
     const { draggedThumbIndex, draggedTrackPos } = this.state;
-    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed, lockedSpeed } = this.props;
+    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed } = this.props;
     if (
       draggedThumbIndex === -1 &&
       draggedTrackPos[0] === -1 &&
