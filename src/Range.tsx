@@ -278,6 +278,12 @@ class Range extends React.Component<IProps> {
       );
       // move the thumb which is closest to the place where the track is clicked
       this.thumbRefs[draggedThumbIndex].current?.focus();
+      var currentThumb = this.thumbRefs[draggedThumbIndex].current;
+      if (currentThumb) {
+        currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
+                                          currentThumb.mozRequestPointerLock;
+        currentThumb.requestPointerLock()
+      }
       this.setState(
         {
           draggedThumbIndex
@@ -330,6 +336,12 @@ class Range extends React.Component<IProps> {
       );
       // move the thumb which is closest to the place where the track is clicked
       this.thumbRefs[draggedThumbIndex].current?.focus();
+      var currentThumb = this.thumbRefs[draggedThumbIndex].current;
+      if (currentThumb) {
+        currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
+                                          currentThumb.mozRequestPointerLock;
+        currentThumb.requestPointerLock()
+      }
       this.setState(
         {
           draggedThumbIndex
@@ -582,6 +594,14 @@ class Range extends React.Component<IProps> {
       this.state.draggedTrackPos[1] === -1
     )
       return null;
+    var currentThumb = this.thumbRefs[this.state.draggedThumbIndex].current;
+    if (currentThumb && (document.pointerLockElement === currentThumb ||
+        document.mozPointerLockElement === currentThumb)) {
+      document.exitPointerLock = document.exitPointerLock    ||
+                                 document.mozExitPointerLock;
+      // Attempt to unlock
+      document.exitPointerLock();
+    }
     this.setState({ draggedThumbIndex: -1, draggedTrackPos: [-1, -1], lastMouse: [-1, -1] }, () => {
       this.fireOnFinalChange();
     });
