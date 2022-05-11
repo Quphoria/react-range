@@ -625,7 +625,7 @@ class Range extends React.Component<IProps> {
       this.state.draggedTrackPos[1] === -1
     )
       return null;
-    var currentThumb = this.thumbRefs[this.state.draggedThumbIndex].current;
+    const currentThumb = this.state.draggedThumbIndex != -1 && this.thumbRefs[this.state.draggedThumbIndex].current;
     // Use type any as otherwise unable to find mozRequestPointerLock
     let _document: any = document;
     if (currentThumb && (
