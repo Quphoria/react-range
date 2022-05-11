@@ -339,15 +339,6 @@ class Range extends React.Component<IProps> {
       );
       // move the thumb which is closest to the place where the track is clicked
       this.thumbRefs[draggedThumbIndex].current?.focus();
-      // Use type any as otherwise unable to find mozRequestPointerLock
-      let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
-      if (currentThumb && this.props.relativeDrag) {
-        currentThumb.requestPointerLock =
-          currentThumb.requestPointerLock ||
-          currentThumb.mozRequestPointerLock ||
-          currentThumb.webkitRequestPointerLock;
-        currentThumb.requestPointerLock()
-      }
       this.setState(
         {
           draggedThumbIndex
@@ -386,7 +377,7 @@ class Range extends React.Component<IProps> {
   onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
     var dX = 0, dY = 0;
-    const currentThumb = this.thumbRefs[this.state.draggedThumbIndex].current;
+    const currentThumb = this.state.draggedThumbIndex != -1 && this.thumbRefs[this.state.draggedThumbIndex].current;
     // Use type any as otherwise unable to find mozRequestPointerLock
     let _document: any = document;
     let _e: any = e;
@@ -396,6 +387,7 @@ class Range extends React.Component<IProps> {
         _document.webkitPointerLockElement === currentThumb)) {
       dX = _e.movementX || _e.mozMovementX || _e.webkitMovementX || 0;
       dY = _e.movementY || _e.mozMovementY || _e.webkitMovementY || 0;
+      dX = -dX, dY = -dY; // Invert direction
     }
     this.onMove(e.clientX, e.clientY, e.shiftKey, dX, dY);
     this.setState({
