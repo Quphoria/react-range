@@ -34,8 +34,7 @@ class Range extends React.Component<IProps> {
     relativeDrag: false,
     lockPointer: false,
     speed: 1.0,
-    shiftSpeed: 0.1,
-    lockedSpeed: 1.0
+    shiftSpeed: 0.1
   };
   trackRef = React.createRef<HTMLElement>();
   thumbRefs: React.RefObject<HTMLElement>[] = [];
@@ -525,11 +524,7 @@ class Range extends React.Component<IProps> {
       }
       if (relativeDrag) {
         // Apply speed adjustment
-        if (pointerLocked) {
-          deltaValue *= lockedSpeed;
-        } else {
-          deltaValue *= -(shiftPressed ? shiftSpeed : speed); // Invert direction as well
-        }
+        deltaValue *= -(shiftPressed ? shiftSpeed : speed); // Invert direction as well
       } 
       // invert for RTL
       if (rtl) {
