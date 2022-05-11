@@ -270,6 +270,14 @@ relativeDrag: boolean;
 
 If `true`, the slider move relative to where the mouse started at. Default is `false`.
 
+### lockPointer (optional)
+
+```ts
+lockPointer: boolean;
+```
+
+Locks the pointer to the slider if relativeDrag is enabled
+
 ### speed (optional)
 
 ```ts

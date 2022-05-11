@@ -32,8 +32,10 @@ class Range extends React.Component<IProps> {
     min: 0,
     max: 100,
     relativeDrag: false,
+    lockPointer: false,
     speed: 1.0,
     shiftSpeed: 0.1,
+    lockedSpeed: 1.0
   };
   trackRef = React.createRef<HTMLElement>();
   thumbRefs: React.RefObject<HTMLElement>[] = [];
@@ -49,6 +51,7 @@ class Range extends React.Component<IProps> {
     thumbZIndexes: new Array(this.props.values.length).fill(0).map((t, i) => i),
     isChanged: false,
     lastMouse: [-1, -1],
+    currentMouse: [-1, -1],
     markOffsets: []
   };
 
@@ -248,7 +251,8 @@ class Range extends React.Component<IProps> {
     e.preventDefault();
     this.addMouseEvents(e.nativeEvent);
     this.setState({
-      lastMouse: [e.clientX, e.clientY]
+      lastMouse: [e.clientX, e.clientY],
+      currentMouse: [e.clientX, e.clientY]
     });
     if (this.props.values.length > 1 && this.props.draggableTrack) {
       if (
@@ -280,7 +284,7 @@ class Range extends React.Component<IProps> {
       this.thumbRefs[draggedThumbIndex].current?.focus();
       // Use type any as otherwise unable to find mozRequestPointerLock
       let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
-      if (currentThumb && this.props.relativeDrag) {
+      if (currentThumb && this.props.relativeDrag && this.props.lockPointer) {
         currentThumb.requestPointerLock =
           currentThumb.requestPointerLock ||
           currentThumb.mozRequestPointerLock ||
@@ -381,15 +385,19 @@ class Range extends React.Component<IProps> {
     // Use type any as otherwise unable to find mozRequestPointerLock
     let _document: any = document;
     let _e: any = e;
-    if (this.props.relativeDrag && currentThumb && (
+    var pointerLocked = false;
+    if (this.props.relativeDrag && this.props.lockPointer && currentThumb && (
         _document.pointerLockElement === currentThumb ||
         _document.mozPointerLockElement === currentThumb ||
         _document.webkitPointerLockElement === currentThumb)) {
       dX = _e.movementX || _e.mozMovementX || _e.webkitMovementX || 0;
       dY = _e.movementY || _e.mozMovementY || _e.webkitMovementY || 0;
-      dX = -dX, dY = -dY; // Invert direction
+      this.setState({
+        currentMouse: [this.state.currentMouse[0] + dX, this.state.currentMouse[1] + dY]
+      });
+      pointerLocked = true;
     }
-    this.onMove(e.clientX, e.clientY, e.shiftKey, dX, dY);
+    this.onMove(e.clientX, e.clientY, e.shiftKey, pointerLocked);
     this.setState({
       lastMouse: [e.clientX, e.clientY]
     });
@@ -474,9 +482,9 @@ class Range extends React.Component<IProps> {
     );
   };
 
-  onMove = (clientX: number, clientY: number, shiftPressed: boolean, dX=0, dY=0) => {
+  onMove = (clientX: number, clientY: number, shiftPressed: boolean, pointerLocked: boolean = false) => {
     const { draggedThumbIndex, draggedTrackPos } = this.state;
-    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed } = this.props;
+    const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed, lockedSpeed } = this.props;
     if (
       draggedThumbIndex === -1 &&
       draggedTrackPos[0] === -1 &&
@@ -494,8 +502,10 @@ class Range extends React.Component<IProps> {
     const startPosY = relativeDrag ? this.state.lastMouse[1] : draggedTrackPos[1];
     if (startPosX !== -1 && startPosY !== -1) {
       // calculate how much it moved since the last update
-      dX = dX || clientX - startPosX;
-      dY = dX || clientY - startPosY;
+      if (!pointerLocked) {
+        dX = clientX - startPosX;
+        dY = clientY - startPosY;
+      }
 
       // calculate the delta of the value
       let deltaValue = 0;
@@ -513,13 +523,21 @@ class Range extends React.Component<IProps> {
       }
       if (relativeDrag) {
         // Apply speed adjustment
-        deltaValue *= -(shiftPressed ? shiftSpeed : speed); // Invert direction as well
+        if (pointerLocked) {
+          deltaValue *= lockedSpeed;
+        } else {
+          deltaValue *= -(shiftPressed ? shiftSpeed : speed); // Invert direction as well
+        }
       } 
       // invert for RTL
       if (rtl) {
         deltaValue *= -1;
       }
       if (Math.abs(deltaValue) >= step / 2) {
+        // Only update current mouse position when the movement made a step
+        this.setState({
+          currentMouse: this.state.lastMouse
+        });
         // adjust delta so it fits into the range
         for (let i = 0; i < this.thumbRefs.length; i++) {
           if (

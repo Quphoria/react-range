@@ -19,8 +19,10 @@ export interface IProps {
   disabled: boolean;
   rtl: boolean;
   relativeDrag: boolean;
+  lockPointer: boolean;
   speed: number;
   shiftSpeed: number;
+  lockedSpeed: number;
   onChange: (values: number[]) => void;
   onFinalChange?: (values: number[]) => void;
   renderMark?: (params: IRenderMarkParams) => React.ReactNode;
