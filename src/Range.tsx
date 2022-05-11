@@ -281,9 +281,10 @@ class Range extends React.Component<IProps> {
       // Use type any as otherwise unable to find mozRequestPointerLock
       let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
       if (currentThumb && this.props.relativeDrag) {
-        currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
-                                          currentThumb.mozRequestPointerLock ||
-                                          currentThumb.webkitRequestPointerLock;
+        currentThumb.requestPointerLock =
+          currentThumb.requestPointerLock ||
+          currentThumb.mozRequestPointerLock ||
+          currentThumb.webkitRequestPointerLock;
         currentThumb.requestPointerLock()
       }
       this.setState(
@@ -341,9 +342,10 @@ class Range extends React.Component<IProps> {
       // Use type any as otherwise unable to find mozRequestPointerLock
       let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
       if (currentThumb && this.props.relativeDrag) {
-        currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
-                                          currentThumb.mozRequestPointerLock ||
-                                          currentThumb.webkitRequestPointerLock;
+        currentThumb.requestPointerLock =
+          currentThumb.requestPointerLock ||
+          currentThumb.mozRequestPointerLock ||
+          currentThumb.webkitRequestPointerLock;
         currentThumb.requestPointerLock()
       }
       this.setState(
@@ -383,7 +385,19 @@ class Range extends React.Component<IProps> {
 
   onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
-    this.onMove(e.clientX, e.clientY, e.shiftKey);
+    var dX = 0, dY = 0;
+    const currentThumb = this.thumbRefs[this.state.draggedThumbIndex].current;
+    // Use type any as otherwise unable to find mozRequestPointerLock
+    let _document: any = document;
+    let _e: any = e;
+    if (this.props.relativeDrag && currentThumb && (
+        _document.pointerLockElement === currentThumb ||
+        _document.mozPointerLockElement === currentThumb ||
+        _document.webkitPointerLockElement === currentThumb)) {
+      dX = _e.movementX || _e.mozMovementX || _e.webkitMovementX || 0;
+      dY = _e.movementY || _e.mozMovementY || _e.webkitMovementY || 0;
+    }
+    this.onMove(e.clientX, e.clientY, e.shiftKey, dX, dY);
     this.setState({
       lastMouse: [e.clientX, e.clientY]
     });
@@ -468,7 +482,7 @@ class Range extends React.Component<IProps> {
     );
   };
 
-  onMove = (clientX: number, clientY: number, shiftPressed: boolean) => {
+  onMove = (clientX: number, clientY: number, shiftPressed: boolean, dX=0, dY=0) => {
     const { draggedThumbIndex, draggedTrackPos } = this.state;
     const { direction, min, max, onChange, values, step, rtl, relativeDrag, speed, shiftSpeed } = this.props;
     if (
@@ -488,8 +502,9 @@ class Range extends React.Component<IProps> {
     const startPosY = relativeDrag ? this.state.lastMouse[1] : draggedTrackPos[1];
     if (startPosX !== -1 && startPosY !== -1) {
       // calculate how much it moved since the last update
-      let dX = clientX - startPosX;
-      let dY = clientY - startPosY;
+      dX = dX || clientX - startPosX;
+      dY = dX || clientY - startPosY;
+
       // calculate the delta of the value
       let deltaValue = 0;
       switch (direction) {
@@ -601,11 +616,14 @@ class Range extends React.Component<IProps> {
     var currentThumb = this.thumbRefs[this.state.draggedThumbIndex].current;
     // Use type any as otherwise unable to find mozRequestPointerLock
     let _document: any = document;
-    if (currentThumb && (_document.pointerLockElement === currentThumb ||
-                         _document.mozPointerLockElement === currentThumb)) {
-      _document.exitPointerLock = _document.exitPointerLock    ||
-                                  _document.mozExitPointerLock ||
-                                  _document.webkitExitPointerLock;
+    if (currentThumb && (
+        _document.pointerLockElement === currentThumb ||
+        _document.mozPointerLockElement === currentThumb ||
+        _document.webkitPointerLockElement === currentThumb)) {
+      _document.exitPointerLock =
+        _document.exitPointerLock ||
+        _document.mozExitPointerLock ||
+        _document.webkitExitPointerLock;
       // Attempt to unlock
       document.exitPointerLock();
     }
