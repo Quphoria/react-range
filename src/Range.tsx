@@ -282,7 +282,8 @@ class Range extends React.Component<IProps> {
       let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
       if (currentThumb && this.props.relativeDrag) {
         currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
-                                          currentThumb.mozRequestPointerLock;
+                                          currentThumb.mozRequestPointerLock ||
+                                          currentThumb.webkitRequestPointerLock;
         currentThumb.requestPointerLock()
       }
       this.setState(
@@ -341,7 +342,8 @@ class Range extends React.Component<IProps> {
       let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
       if (currentThumb && this.props.relativeDrag) {
         currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
-                                          currentThumb.mozRequestPointerLock;
+                                          currentThumb.mozRequestPointerLock ||
+                                          currentThumb.webkitRequestPointerLock;
         currentThumb.requestPointerLock()
       }
       this.setState(
@@ -602,7 +604,8 @@ class Range extends React.Component<IProps> {
     if (currentThumb && (_document.pointerLockElement === currentThumb ||
                          _document.mozPointerLockElement === currentThumb)) {
       _document.exitPointerLock = _document.exitPointerLock    ||
-                                  _document.mozExitPointerLock;
+                                  _document.mozExitPointerLock ||
+                                  _document.webkitExitPointerLock;
       // Attempt to unlock
       document.exitPointerLock();
     }
