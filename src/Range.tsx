@@ -502,10 +502,12 @@ class Range extends React.Component<IProps> {
     const startPosY = relativeDrag ? this.state.lastMouse[1] : draggedTrackPos[1];
     if (startPosX !== -1 && startPosY !== -1) {
       // calculate how much it moved since the last update
-      if (!pointerLocked) {
-        dX = clientX - startPosX;
-        dY = clientY - startPosY;
+      if (pointerLocked) {
+        clientX = this.state.currentMouse[0];
+        clientY = this.state.currentMouse[1];
       }
+      let dX = clientX - startPosX;
+      let dY = clientY - startPosY;
 
       // calculate the delta of the value
       let deltaValue = 0;
