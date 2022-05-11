@@ -279,7 +279,7 @@ class Range extends React.Component<IProps> {
       // move the thumb which is closest to the place where the track is clicked
       this.thumbRefs[draggedThumbIndex].current?.focus();
       var currentThumb = this.thumbRefs[draggedThumbIndex].current;
-      if (currentThumb) {
+      if (currentThumb && this.props.relativeDrag) {
         currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
                                           currentThumb.mozRequestPointerLock;
         currentThumb.requestPointerLock()
@@ -337,7 +337,7 @@ class Range extends React.Component<IProps> {
       // move the thumb which is closest to the place where the track is clicked
       this.thumbRefs[draggedThumbIndex].current?.focus();
       var currentThumb = this.thumbRefs[draggedThumbIndex].current;
-      if (currentThumb) {
+      if (currentThumb && this.props.relativeDrag) {
         currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
                                           currentThumb.mozRequestPointerLock;
         currentThumb.requestPointerLock()
