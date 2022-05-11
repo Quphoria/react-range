@@ -455,6 +455,7 @@ class Range extends React.Component<IProps> {
         )
       );
     } else if (e.key === 'Tab') {
+      this.releasePointerLock();
       this.setState({ draggedThumbIndex: -1 }, () => {
         // If key pressed when thumb was moving, fire onFinalChange
         if (isChanged) {
@@ -474,6 +475,7 @@ class Range extends React.Component<IProps> {
     if (!(INCREASE_KEYS.includes(e.key) ||
       DECREASE_KEYS.includes(e.key) ||
       e.key === 'Tab')) return;
+    this.releasePointerLock();
     this.setState(
       {
         draggedThumbIndex: -1
@@ -615,19 +617,7 @@ class Range extends React.Component<IProps> {
     return normalizeValue(value, index, min, max, step, allowOverlap, values);
   };
 
-  onEnd = (e: Event) => {
-    e.preventDefault();
-    document.removeEventListener('mousemove', this.schdOnMouseMove);
-    document.removeEventListener('touchmove', this.schdOnTouchMove);
-    document.removeEventListener('mouseup', this.schdOnEnd);
-    document.removeEventListener('touchend', this.schdOnEnd);
-    document.removeEventListener('touchcancel', this.schdOnEnd);
-    if (
-      this.state.draggedThumbIndex === -1 &&
-      this.state.draggedTrackPos[0] === -1 &&
-      this.state.draggedTrackPos[1] === -1
-    )
-      return null;
+  releasePointerLock = () => {
     const currentThumb = this.state.draggedThumbIndex != -1 && this.thumbRefs[this.state.draggedThumbIndex].current;
     // Use type any as otherwise unable to find mozRequestPointerLock
     let _document: any = document;
@@ -642,6 +632,22 @@ class Range extends React.Component<IProps> {
       // Attempt to unlock
       document.exitPointerLock();
     }
+  }
+
+  onEnd = (e: Event) => {
+    e.preventDefault();
+    document.removeEventListener('mousemove', this.schdOnMouseMove);
+    document.removeEventListener('touchmove', this.schdOnTouchMove);
+    document.removeEventListener('mouseup', this.schdOnEnd);
+    document.removeEventListener('touchend', this.schdOnEnd);
+    document.removeEventListener('touchcancel', this.schdOnEnd);
+    if (
+      this.state.draggedThumbIndex === -1 &&
+      this.state.draggedTrackPos[0] === -1 &&
+      this.state.draggedTrackPos[1] === -1
+    )
+      return null;
+    this.releasePointerLock();
     this.setState({ draggedThumbIndex: -1, draggedTrackPos: [-1, -1], lastMouse: [-1, -1] }, () => {
       this.fireOnFinalChange();
     });
