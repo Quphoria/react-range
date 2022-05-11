@@ -278,7 +278,8 @@ class Range extends React.Component<IProps> {
       );
       // move the thumb which is closest to the place where the track is clicked
       this.thumbRefs[draggedThumbIndex].current?.focus();
-      var currentThumb = this.thumbRefs[draggedThumbIndex].current;
+      // Use type any as otherwise unable to find mozRequestPointerLock
+      let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
       if (currentThumb && this.props.relativeDrag) {
         currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
                                           currentThumb.mozRequestPointerLock;
@@ -336,7 +337,8 @@ class Range extends React.Component<IProps> {
       );
       // move the thumb which is closest to the place where the track is clicked
       this.thumbRefs[draggedThumbIndex].current?.focus();
-      var currentThumb = this.thumbRefs[draggedThumbIndex].current;
+      // Use type any as otherwise unable to find mozRequestPointerLock
+      let currentThumb: any = this.thumbRefs[draggedThumbIndex].current;
       if (currentThumb && this.props.relativeDrag) {
         currentThumb.requestPointerLock = currentThumb.requestPointerLock ||
                                           currentThumb.mozRequestPointerLock;
@@ -595,10 +597,12 @@ class Range extends React.Component<IProps> {
     )
       return null;
     var currentThumb = this.thumbRefs[this.state.draggedThumbIndex].current;
-    if (currentThumb && (document.pointerLockElement === currentThumb ||
-        document.mozPointerLockElement === currentThumb)) {
-      document.exitPointerLock = document.exitPointerLock    ||
-                                 document.mozExitPointerLock;
+    // Use type any as otherwise unable to find mozRequestPointerLock
+    let _document: any = document;
+    if (currentThumb && (_document.pointerLockElement === currentThumb ||
+                         _document.mozPointerLockElement === currentThumb)) {
+      _document.exitPointerLock = _document.exitPointerLock    ||
+                                  _document.mozExitPointerLock;
       // Attempt to unlock
       document.exitPointerLock();
     }
