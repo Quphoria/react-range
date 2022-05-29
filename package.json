@@ -1,5 +1,5 @@
 {
-  "name": "@Quphoria/react-range",
+  "name": "@quphoria/react-range",
   "version": "1.8.13",
   "description": "Range input. Slides in all directions.",
   "main": "lib/index.js",
