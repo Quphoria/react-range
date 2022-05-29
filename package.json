@@ -1,5 +1,5 @@
 {
-  "name": "react-range",
+  "name": "@Quphoria/react-range",
   "version": "1.8.12",
   "description": "Range input. Slides in all directions.",
   "main": "lib/index.js",
@@ -9,9 +9,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tajo/react-range"
+    "url": "https://github.com/Quphoria/react-range"
   },
-  "author": "Vojtech Miksu <vojtech@miksu.cz>",
+  "author": "Samuel Simpson <https://github.com/Quphoria> Vojtech Miksu <vojtech@miksu.cz>",
   "license": "MIT",
   "scripts": {
     "prepare": "rm -rf lib && tsc --outDir lib && cp flowtypes/* lib && rm -rf lib/examples && mv lib/src/* lib && rm -rf lib/src && rm lib/*.test.* && rm lib/*.stories.*",
